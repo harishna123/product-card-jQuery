@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./jquery-3.7.1.min.js"></script>
+  </head>
+  <body>
+    <a href="">arc</a>
+    <p>hello</p>
+
+    <script>
+
+      $(document).ready(function () {
+        $("p").click(function (event) { 
+          alert("visiting!");
+        });
+      });
+
+      var a = jQuery.noConflict();
+      a("a").click(function (event) {
+        alert("hello world!");
+      });
+
+      
+    </script>
+  </body>
+</html>

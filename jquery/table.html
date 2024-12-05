@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <input type="text" id="input">
+    <button id="searchBtn">search</button>
+
+    <input type="text" id="name" placeholder="name">
+    <input type="text" id="lastname" placeholder="last name">
+    <input type="text" id="roll" placeholder="rollno">
+    <input type="text" id="add" placeholder="add">
+    <button id="addBtn">add</button>
+
+    <table width="50%" border="2px">
+        <tr>
+            <th>name</th>
+            <th>last name</th>
+            <th>roll no</th>
+            <th>address</th>
+        </tr>
+        <tbody id="table"></tbody>
+    </table>
+</body>
+
+<script>
+    var a = [
+        { name: "aarsi", lastname: "savani", rollno: 1, add: "ramdev" },
+        { name: "ishita", lastname: "savani", rollno: 2, add: "ramdev" },
+        { name: "jumisha", lastname: "savani", rollno: 3, add: "ramdev" },
+        { name: "hari", lastname: "savani", rollno: 4, add: "ramdev" },
+        { name: "kruti", lastname: "savani", rollno: 5, add: "ramdev" }
+    ];
+
+    function loadData() {
+        var html = "";
+        for (let i = 0; i < a.length; i++) {
+            html += `<tr>
+                <td>${a[i].name}</td>
+                <td>${a[i].lastname}</td>
+                <td>${a[i].rollno}</td>
+                <td>${a[i].add}</td>
+            </tr>`;
+        }
+        $("#table").html(html);
+    }
+
+    function search() {
+        var input = $("#input").val();
+        var html2 = "";
+        for (let i = 0; i < a.length; i++) {
+            if (a[i].name.includes(input)) {
+                html2 = `<tr>
+                    <td>${a[i].name}</td>
+                    <td>${a[i].lastname}</td>
+                    <td>${a[i].rollno}</td>
+                    <td>${a[i].add}</td>
+                </tr>`;
+            }
+        }
+        $("#table").html(html2);
+    }
+
+    function reset() {
+        $("#name").val("");
+        $("#lastname").val("");
+        $("#roll").val("");
+        $("#add").val("");
+    }
+
+    function pushData() {
+        var name = $("#name").val();
+        var lastname = $("#lastname").val();
+        var rollno = $("#roll").val();
+        var add = $("#add").val();
+
+        var obj = { name: name, lastname: lastname, rollno: rollno, add: add };
+        a.push(obj);
+        loadData();
+        reset();
+    }
+
+    $(document).ready(function() {
+        loadData();
+
+        $("#searchBtn").on("click", function() {
+            search();
+        });
+
+        $("#addBtn").on("click", function() {
+            pushData();
+        });
+    });
+</script>
+
+</html>

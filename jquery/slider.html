@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.7.1.min.js"></script>
+</head>
+<style>
+    img {
+        height: 400px;
+        width: 400px;
+    }
+</style>
+
+<body>
+    <div>
+        <button id="pre">pre</button>
+        <img src="https://media.tacdn.com/media/attractions-splice-spp-674x446/0c/04/55/9b.jpg" alt="" class="img">
+        <img src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_640.jpg"
+            alt="" class="img">
+        <img src="https://media1.thrillophilia.com/filestore/l9fcy3sj95mwp23zvk13hdefpx0o_49090236931_e27408bbcc_o.jpg"
+            alt="" class="img">
+        <img src="https://www.sportico.com/wp-content/uploads/2020/09/0911_IMG.jpg?w=1280&h=720&crop=1" alt=""
+            class="img">
+            <button id="next">next</button>
+    </div>
+
+    <script>
+        var index = 0;
+        var images = $(".img");
+
+        function LoadImages() {
+            images.hide();
+            $(images[index]).show(); 
+        }
+
+        $(document).ready(function () {
+            LoadImages(); 
+
+            $("#pre").click(function () {
+                if (index === 0) {
+                    index = images.length - 1;
+                } else {
+                    index--;
+                }
+                LoadImages();
+            });
+
+            $("#next").click(function () {
+                if (index === images.length - 1) {
+                    index = 0;
+                } else {
+                    index++;
+                }
+                LoadImages();
+            });
+        });
+    </script>
+</body>
+</html>

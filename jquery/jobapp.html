@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Management</title>
+    <style>
+        button {
+            margin: 5px;
+        }
+    </style>
+    <script src="./jquery-3.7.1.min.js"></script>
+</head>
+<body>
+
+    <input type="text" id="input1" placeholder="Name">
+    <input type="text" id="input2" placeholder="Lastname">
+    <input type="text" id="input3" placeholder="Current Address">
+    <input type="text" id="input4" placeholder="City">
+    <input type="email" id="input5" placeholder="Email Address">
+    <input type="text" id="input6" placeholder="Experience">
+    <input type="number" id="input7" placeholder="ID" readonly>
+
+    <button id="addButton">Add</button>
+    <button id="updateButton" style="display:none;">Update</button>
+
+    <table border="2px" width="50%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Lastname</th>
+                <th>Current Address</th>
+                <th>City</th>
+                <th>Email</th>
+                <th>Experience</th>
+                <th>ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table">
+        </tbody>
+    </table>
+
+    <script>
+        let applications = [];
+        let selectedIndex = -1;
+
+        function getData() {
+            $.ajax({
+                url: "https://66b9f32cfa763ff550fa3e64.mockapi.io/jobapplication",
+                method: "GET",
+                success: function(data) {
+                    applications = data;
+                    renderTable();
+                },
+                error: function(error) {
+                    console.error("Failed to fetch data:", error);
+                }
+            });
+        }
+
+        function renderTable() {
+            const table = $("#table");
+            table.html(""); 
+
+            applications.forEach(function(application, index) {
+                const row = `
+                    <tr>
+                        <td>${application.name}</td>
+                        <td>${application.lastname}</td>
+                        <td>${application.currentaddress}</td>
+                        <td>${application.city}</td>
+                        <td>${application.emailaddress}</td>
+                        <td>${application.experience}</td>
+                        <td>${application.id}</td>
+                        <td>
+                            <button onclick="editApplication(${index})">Edit</button>
+                            <button onclick="deleteApplication(${index})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                table.append(row);
+            });
+        }
+
+        // Add a new job application to the table
+        $("#addButton").on("click", function() {
+            const newApplication = {
+                name: $("#input1").val(),
+                lastname: $("#input2").val(),
+                currentaddress: $("#input3").val(),
+                city: $("#input4").val(),
+                emailaddress: $("#input5").val(),
+                experience: $("#input6").val(),
+                id: applications.length + 1
+            };
+
+            $.ajax({
+                url: "https://66b9f32cfa763ff550fa3e64.mockapi.io/jobapplication",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(newApplication),
+                success: function(data) {
+                    applications.push(data);
+                    renderTable();
+                    clearInputs();
+                },
+                error: function(error) {
+                    console.error("Failed to add application:", error);
+                }
+            });
+        });
+
+        // Update an existing job application's details
+        $("#updateButton").on("click", function() {
+            if (selectedIndex >= 0) {
+                const updatedApplication = {
+                    name: $("#input1").val(),
+                    lastname: $("#input2").val(),
+                    currentaddress: $("#input3").val(),
+                    city: $("#input4").val(),
+                    emailaddress: $("#input5").val(),
+                    experience: $("#input6").val()
+                };
+                const id = $("#input7").val();
+
+                $.ajax({
+                    url: `https://66b9f32cfa763ff550fa3e64.mockapi.io/jobapplication/${id}`,
+                    method: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(updatedApplication),
+                    success: function(data) {
+                        applications[selectedIndex] = data;
+                        renderTable();
+                        clearInputs();
+                        $("#addButton").show();
+                        $("#updateButton").hide();
+                    },
+                    error: function(error) {
+                        console.error("Failed to update application:", error);
+                    }
+                });
+            }
+        });
+
+        // Edit a job application's details
+        function editApplication(index) {
+            selectedIndex = index;
+            const application = applications[index];
+
+            $("#input1").val(application.name);
+            $("#input2").val(application.lastname);
+            $("#input3").val(application.currentaddress);
+            $("#input4").val(application.city);
+            $("#input5").val(application.emailaddress);
+            $("#input6").val(application.experience);
+            $("#input7").val(application.id);
+
+            $("#addButton").hide();
+            $("#updateButton").show();
+        }
+
+        // Delete a job application from the table
+        function deleteApplication(index) {
+            const applicationId = applications[index].id;
+
+            $.ajax({
+                url:` https://66b9f32cfa763ff550fa3e64.mockapi.io/jobapplication/${applicationId}`,
+                method: "DELETE",
+                success: function() {
+                    if (alert) {
+                        alert("are you sure?")
+                        applications.splice(index, 1);
+                        renderTable();
+                        clearInputs();
+                    }
+                },
+                error: function(error) {
+                    console.error("Failed to delete application:", error);
+                }
+            });
+        }
+
+        // Clear input fields
+        function clearInputs() {
+            $("#input1").val("");
+            $("#input2").val("");
+            $("#input3").val("");
+            $("#input4").val("");
+            $("#input5").val("");
+            $("#input6").val("");
+            $("#input7").val("");
+            selectedIndex = -1;
+
+            $("#addButton").show();
+            $("#updateButton").hide();
+        }
+
+        // Initial data fetch and table render
+        $(document).ready(getData);
+    </script>
+
+</body>
+</html>

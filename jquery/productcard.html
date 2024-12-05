@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Cards</title>
+    <link rel="stylesheet" href="./css/all.min.css" />
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <script src="./jquery-3.7.1.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+
+    <style>
+      .container {
+        width: 80%;
+        margin: auto;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .col-4 {
+        flex: 0 0 30%;
+        margin-bottom: 20px;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .card-img-top {
+        width: 90%;
+        height: 225px;
+      }
+      .card img {
+        max-width: 100%;
+        height: auto;
+      }
+      .card-footer {
+        background-color: #ff772e;
+        font-weight: 700;
+      }
+      .star {
+        color: #f39c12;
+      }
+      #pagination {
+        text-align: center;
+        margin-top: 20px;
+      }
+      #pagination button {
+        padding: 10px 15px;
+        text-align: center;
+        margin: 0px 5px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+      }
+      #pagination button.active {
+        background-color: #2ecc71;
+        color: #fff;
+      }
+      .price {
+        color: #ff4517;
+        font-weight: 600;
+      }
+      .star {
+        margin-bottom: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="filter-form">
+      <label>Choose the cards:</label>
+      <select id="itemcard">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
+      <label>Skip the cards:</label>
+      <select id="skipcard">
+        <option value="0">0</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
+      <input type="submit" value="submit" />
+      <br /><br />
+    </form>
+
+    <div class="container">
+      <div id="product-container" class="row"></div>
+      <div id="pagination" class="pagination"></div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        let productsData = [];
+        let currentPage = 1;
+        let itemsPerPage = 5;
+        let skip = 0;
+        const defaultImage =
+          "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+
+        function getData() {
+          const url =`https://dummyjson.com/products?limit=${itemsPerPage}&skip=${skip}`;
+          $.ajax({
+            url: url,
+            method: "GET",
+            success: function (data) {
+              productsData = data.products;
+              displayProducts(currentPage);
+            },
+            error: function (xhr, status, error) {
+              console.error("Failed to fetch data:", error);
+            },
+          });
+        }
+
+        function generateStars(rating) {
+          const roundedRating = Math.round(rating);
+          let starsHtml = "";
+          for (let i = 0; i < 5; i++) {
+            starsHtml +=
+              i < roundedRating? '<i class="fa-solid star fa-star"></i>': '<i class="fa-regular star fa-star"></i>';
+          }
+          return starsHtml;
+        }
+
+        function displayProducts(page) {
+          const productContainer = $("#product-container");
+          const start = (page - 1) * itemsPerPage;
+          const end = page * itemsPerPage;
+          const products = productsData.slice(start, end);
+
+          let html = "";
+          products.forEach((product) => {
+            const productImage = product.thumbnail || defaultImage;
+            html += `
+                    <div class="col-4">
+                        <div class="card">
+                            <img class="card-img-top" src="${productImage}" alt="Product Image">
+                            <h5 class="card-title fw-bold mb-2">${
+                              product.title
+                            }</h5>
+                            <p class="card-text">${product.description}</p>
+                            <p class="price">Price: $${product.price}</p>
+                            <div class="staricon">${generateStars(
+                              product.rating
+                            )}</div>
+                            <div class="card-footer">
+                              <p class="mb-1">ADD TO CART</p>
+                            </div>
+                        </div>
+                    </div>`;
+          });
+          productContainer.html(html);
+        }
+
+        $("#filter-form").on("submit", function (event) {
+          event.preventDefault();
+          itemsPerPage = parseInt($("#itemcard").val());
+          skip = parseInt($("#skipcard").val());
+          currentPage = 1; 
+          getData();
+        });
+        getData();
+      });
+    </script>
+  </body>
+</html>
